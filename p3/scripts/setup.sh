@@ -1,10 +1,22 @@
 #!/bin/bash
 
 # docker installation
-# hdiutil attach Docker.dmg
-# /Volumes/Docker/Docker.app/Contents/MacOS/install
-# hdiutil detach /Volumes/Docker
+apt-get update -y
 
+apt-get install ca-certificates curl gnupg
+
+install -m 0755 -d /etc/apt/keyrings
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+chmod a+r /etc/apt/keyrings/docker.gpg
+
+echo \
+  "deb [arch="$(dpkg --print-architecture)" signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
+  "$(. /etc/os-release && echo "$VERSION_CODENAME")" stable" | \
+  tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+apt-get update -y
+
+apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 
 # install k3d - START
 # install kubctl - START
@@ -27,7 +39,6 @@ chmod +x /usr/local/bin/kubectl
 echo "Installing kubectl - END"
 
 # install kubctl - END
-
 
 
 # install argocd - START
@@ -65,10 +76,5 @@ echo "applaying argocd application - END"
 # applaying argocd application - END
 
 
-
 # get argocd password
 # kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d
-
-
-
-
