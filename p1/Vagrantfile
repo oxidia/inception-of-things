@@ -1,0 +1,37 @@
+Vagrant.configure("2") do |config|
+  config.vm.box = "centos/8"
+
+  config.vm.define "ifarahiS" do |config1|
+    config1.vm.hostname = "ifarahiS"
+    config1.vm.network "private_network", ip: "192.168.56.110"
+
+    config1.vm.provider "virtualbox" do |vm|
+      vm.memory = 1024
+      vm.cpus = 1
+      vm.name = "ifarahiS"
+      vm.customize ["modifyvm", :id, "--name", "ifarahiS"]
+    end
+
+    config1.vm.provision "shell", path: "scripts/init-master-node.sh"
+
+  end
+
+  config.vm.define "ifarahiSW" do |config1|
+    config1.vm.hostname = "ifarahiSW"
+    config1.vm.network "private_network", ip: "192.168.56.111"
+
+    config1.vm.provider "virtualbox" do |vm|
+      vm.memory = 1024
+      vm.cpus = 1
+      vm.name = "ifarahiSW"
+      vm.customize ["modifyvm", :id, "--name", "ifarahiSW"]
+    end
+
+    config1.trigger.after :up do |trigger|
+      trigger.run = {path: 'scripts/copy-token.sh'}
+      trigger.run_remote = {path: 'scripts/init-worker-node.sh'}
+    end
+
+  end
+
+end
